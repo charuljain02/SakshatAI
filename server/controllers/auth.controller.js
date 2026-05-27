@@ -23,8 +23,8 @@ export const googleAuth = async (req, res) => {
         // Set Cookie
         res.cookie("token", token, {
             httpOnly: true,
-            secure: false, // true only in production with HTTPS
-            sameSite: "lax",
+            secure: true,
+            sameSite: "none",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
