@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
-import maleVideo from "../assets/videos/male-ai.mp4";
-import femaleVideo from "../assets/videos/female-ai.mp4";
+import maleVideo from "../assets/Videos/male-ai.mp4";
+import femaleVideo from "../assets/Videos/female-ai.mp4";
 
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
 import { BsArrowRight } from "react-icons/bs";
@@ -50,42 +50,49 @@ function Step2Interview({ interviewData, onFinish }) {
   }, [isAIPlaying]);
 
   /* -------------------- LOAD VOICES -------------------- */
-  useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return;
+  
+useEffect(() => {
+  const loadVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
 
-      const femaleVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("zira") ||
-          v.name.toLowerCase().includes("female") ||
-          v.name.toLowerCase().includes("samantha")
-      );
+    if (!voices.length) return;
 
-      if (femaleVoice) {
-        setSelectedVoice(femaleVoice);
-        setVoiceGender("female");
-        return;
-      }
+    // MALE VOICE FIRST
+    const maleVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("david") ||
+        v.name.toLowerCase().includes("male") ||
+        v.name.toLowerCase().includes("mark")
+    );
 
-      const maleVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("david") ||
-          v.name.toLowerCase().includes("male")
-      );
+    if (maleVoice) {
+      setSelectedVoice(maleVoice);
+      setVoiceGender("male");
+      return;
+    }
 
-      if (maleVoice) {
-        setSelectedVoice(maleVoice);
-        setVoiceGender("male");
-        return;
-      }
+    // FEMALE FALLBACK
+    const femaleVoice = voices.find(
+      (v) =>
+        v.name.toLowerCase().includes("zira") ||
+        v.name.toLowerCase().includes("female") ||
+        v.name.toLowerCase().includes("samantha")
+    );
 
-      setSelectedVoice(voices[0]);
-    };
+    if (femaleVoice) {
+      setSelectedVoice(femaleVoice);
+      setVoiceGender("female");
+      return;
+    }
 
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-  }, []);
+    setSelectedVoice(voices[0]);
+  };
+
+  loadVoices();
+
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}, []);
+     
 
   const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
 
