@@ -26,7 +26,10 @@ import Footer from '../components/Footer';
 function Home() {
 
   const { userData } = useSelector((state) => state.user)
+
   const [showAuth, setShowAuth] = useState(false);
+  const [authMessage, setAuthMessage] = useState("");
+
   const navigate = useNavigate()
 
   return (
@@ -76,31 +79,35 @@ function Home() {
             <motion.button
               onClick={() => {
                 if (!userData) {
-                  setShowAuth(true)
+                  setAuthMessage("Login to start your AI interview")
+                  navigate("/auth")
                   return;
                 }
+
                 navigate("/interview")
               }}
               whileHover={{ opacity: 0.9, scale: 1.03 }}
               whileTap={{ opacity: 1, scale: 0.98 }}
               className='bg-black text-white px-10 py-3 rounded-full hover:opacity-90 transition shadow-md'
             >
-              Start Interview
+              {userData ? "Start Interview" : "Get Started"}
             </motion.button>
 
             <motion.button
               onClick={() => {
                 if (!userData) {
+                  setAuthMessage("Login to view your interview history")
                   setShowAuth(true)
                   return;
                 }
+
                 navigate("/history")
               }}
               whileHover={{ opacity: 0.9, scale: 1.03 }}
               whileTap={{ opacity: 1, scale: 0.98 }}
               className='border border-gray-300 px-10 py-3 rounded-full hover:bg-gray-100 transition'
             >
-              View History
+              {userData ? "View History" : "Track Progress"}
             </motion.button>
 
           </div>
@@ -307,7 +314,6 @@ function Home() {
 
                   <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
 
-                    {/* LEFT CONTENT */}
                     <div className='w-full md:w-1/2'>
 
                       <h3 className='font-semibold text-xl mb-3'>
@@ -320,7 +326,6 @@ function Home() {
 
                     </div>
 
-                    {/* RIGHT IMAGE */}
                     <div className='w-full md:w-1/2 flex justify-center md:justify-end'>
 
                       <img
@@ -341,9 +346,14 @@ function Home() {
         </div>
 
       </div>
-<Footer/>
+
+      <Footer />
+
       {showAuth && (
-        <AuthModal onClose={() => setShowAuth(false)} />
+        <AuthModal
+          message={authMessage}
+          onClose={() => setShowAuth(false)}
+        />
       )}
 
     </div>

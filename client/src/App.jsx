@@ -36,10 +36,11 @@ function App() {
         dispatch(setUserData(result.data));
 
       } catch (error) {
+if (error.response?.status !== 401) {
+   console.log(error);
+}
 
-        console.log(error);
-
-        dispatch(setUserData(null));
+dispatch(setUserData(null));
       }
     };
 

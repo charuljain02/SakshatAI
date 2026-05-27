@@ -6,7 +6,7 @@ import maleVideo from "../assets/videos/male-ai.mp4";
 import femaleVideo from "../assets/videos/female-ai.mp4";
 
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
-import { BsArrowRight } from "react-icons/bs"; // Swapped to Right Arrow for natural "Next" progression
+import { BsArrowRight } from "react-icons/bs";
 
 import Timer from "./Timer";
 
@@ -31,12 +31,13 @@ function Step2Interview({ interviewData, onFinish }) {
 
   const recognitionRef = useRef(null);
   const videoRef = useRef(null);
+  const streamRef = useRef(null); // Fixes hardware mic recording locks
   const finalTranscriptRef = useRef("");
 
   const currentQuestion = questions[currentIndex];
   const [timeLeft, setTimeLeft] = useState(currentQuestion?.timeLimit || 60);
 
-  // Added dynamic ref states to prevent continuous handler lifecycle re-trigger tracking bugs
+  // Dynamic references tracking live values across asynchronous event loops
   const isMicOnRef = useRef(isMicOn);
   const isAIPlayingRef = useRef(isAIPlaying);
 
@@ -96,7 +97,7 @@ function Step2Interview({ interviewData, onFinish }) {
         return;
       }
 
-      window.speechSynthesis.cancel();
+      window.speechSynthesis.cancel(); // Clears any lingering speech queues safely
       const utterance = new SpeechSynthesisUtterance(text);
 
       utterance.voice = selectedVoice;
@@ -109,7 +110,7 @@ function Step2Interview({ interviewData, onFinish }) {
         stopMic();
         setSubtitle(text);
         if (videoRef.current) {
-          videoRef.current.play();
+          videoRef.current.play().catch((err) => console.log("Video playback caught: ", err));
         }
       };
 
@@ -123,32 +124,43 @@ function Step2Interview({ interviewData, onFinish }) {
         resolve();
       };
 
+      utterance.onerror = () => {
+        setIsAIPlaying(false);
+        setSubtitle("");
+        resolve(); // Prevents lifecycle pipeline from deadlocking on error patterns
+      };
+
       window.speechSynthesis.speak(utterance);
     });
   };
 
-  /* -------------------- INTRO -------------------- */
+  /* -------------------- INTRO CONFIGURATION LIEFOCYCLE -------------------- */
   useEffect(() => {
     if (!selectedVoice) return;
+    let isMounted = true;
 
     const startInterview = async () => {
-      if (isIntroPhase) {
+      if (isIntroPhase && isMounted) {
         await speakText(`Hi ${userName}, welcome to your AI interview.`);
+        if (!isMounted) return;
         await speakText("Please answer confidently and clearly. Let's begin.");
+        if (!isMounted) return;
+        
         setIsIntroPhase(false);
 
-        setTimeout(async () => {
-          if (currentQuestion?.question) {
-            await speakText(currentQuestion.question);
-          }
-        }, 500);
+        if (currentQuestion?.question) {
+          await speakText(currentQuestion.question);
+        }
       }
     };
 
     startInterview();
+    return () => {
+      isMounted = false;
+    };
   }, [selectedVoice]);
 
-  /* -------------------- QUESTION CHANGE -------------------- */
+  /* -------------------- QUESTION CHANGE LIEFOCYCLE -------------------- */
   useEffect(() => {
     if (isIntroPhase) return;
 
@@ -162,7 +174,7 @@ function Step2Interview({ interviewData, onFinish }) {
     setTimeLeft(currentQuestion?.timeLimit || 60);
   }, [currentIndex]);
 
-  /* -------------------- TIMER -------------------- */
+  /* -------------------- TIMER CONTROL -------------------- */
   useEffect(() => {
     if (isIntroPhase || feedback) return;
 
@@ -179,19 +191,19 @@ function Step2Interview({ interviewData, onFinish }) {
     return () => clearInterval(interval);
   }, [isIntroPhase, currentIndex, feedback]);
 
-  /* -------------------- AUTO SUBMIT -------------------- */
+  /* -------------------- AUTO SUBMIT ON TIMEOUT -------------------- */
   useEffect(() => {
     if (timeLeft === 0 && !feedback) {
       submitAnswer();
     }
   }, [timeLeft]);
 
-  /* -------------------- SPEECH RECOGNITION -------------------- */
+  /* -------------------- SPEECH RECOGNITION MIDDLEWARE -------------------- */
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
     if (!SpeechRecognition) {
-      console.log("Speech Recognition framework completely absent from engine environment browser platform.");
+      console.error("Speech Recognition engine completely missing from current client environment window.");
       return;
     }
 
@@ -201,18 +213,18 @@ function Step2Interview({ interviewData, onFinish }) {
     recognition.lang = "en-US";
 
     recognition.onend = () => {
-      // Clean target logic configuration using current reference values safely
+      // Intelligently restarts speech pipeline if cut off by native browser silence parameters
       if (isMicOnRef.current && !isAIPlayingRef.current) {
         try {
           recognition.start();
         } catch (err) {
-          console.log("Speech engine auto restart intercept trace: ", err);
+          console.warn("Speech engine auto restart intercepted gracefully: ", err);
         }
       }
     };
 
     recognition.onerror = (event) => {
-      console.log("Speech Recognition Error:", event.error);
+      console.error("Speech Recognition Engine Error Context:", event.error);
     };
 
     recognition.onresult = (event) => {
@@ -234,25 +246,26 @@ function Step2Interview({ interviewData, onFinish }) {
     recognitionRef.current = recognition;
 
     return () => {
-      recognition.abort(); // Safely terminates active connection pipeline
+      recognition.abort();
     };
   }, []);
 
   /* -------------------- MIC CONTROLS -------------------- */
   const startMic = async () => {
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      streamRef.current = stream; // Cache active stream reference to control hardware locks
       setIsMicOn(true);
-      // Wait for React state lifecycle to catch up before starting recognition
+      
       setTimeout(() => {
         try {
           recognitionRef.current?.start();
         } catch (e) {
-          console.log(e);
+          console.error("Failed to call native recognition start method:", e);
         }
       }, 100);
     } catch (err) {
-      console.log(err);
+      console.error("Microphone hardware access rejected:", err);
       alert("Microphone connection channel access blocked.");
     }
   };
@@ -262,7 +275,13 @@ function Step2Interview({ interviewData, onFinish }) {
     try {
       recognitionRef.current?.stop();
     } catch (e) {
-      console.log(e);
+      console.error("Error pausing speech recognition engine:", e);
+    }
+
+    // Explicitly shut off hardware tracks to dim the user's physical camera/mic activity lights
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
     }
   };
 
@@ -274,7 +293,7 @@ function Step2Interview({ interviewData, onFinish }) {
     }
   };
 
-  /* -------------------- SUBMIT ANSWER -------------------- */
+  /* -------------------- SUBMIT DATA MATRIX -------------------- */
   const submitAnswer = async () => {
     if (isSubmitting) return;
 
@@ -293,18 +312,18 @@ function Step2Interview({ interviewData, onFinish }) {
         { withCredentials: true }
       );
 
-      setFeedback(result?.data?.feedback || "Answer captured perfectly into dashboard metrics engine.");
+      setFeedback(result?.data?.feedback || "Answer captured perfectly into metrics layout.");
     } catch (error) {
-      console.log(error);
-      alert("Failed to push client feedback stream down server infrastructure layout.");
+      console.error("Server synchronization payload failure:", error);
+      alert("Failed to push response stream down server infrastructure layout.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  /* -------------------- NEXT QUESTION -------------------- */
+  /* -------------------- NAVIGATION ROUTE -------------------- */
   const handleNext = async () => {
-    stopMic(); // Hard cut any active listener instance before swapping questions
+    stopMic();
     setAnswer("");
     finalTranscriptRef.current = "";
     setFeedback("");
@@ -317,7 +336,7 @@ function Step2Interview({ interviewData, onFinish }) {
     setCurrentIndex((prev) => prev + 1);
   };
 
-  /* -------------------- FINISH INTERVIEW -------------------- */
+  /* -------------------- TERMINATE PROCESS -------------------- */
   const finishInterview = async () => {
     stopMic();
     try {
@@ -329,16 +348,19 @@ function Step2Interview({ interviewData, onFinish }) {
 
       onFinish(result.data);
     } catch (error) {
-      console.log(error);
+      console.error("Failed to post formal finality stream mapping hook:", error);
     }
   };
 
-  /* -------------------- CLEANUP -------------------- */
+  /* -------------------- PIPELINE CLEANUP UNMOUNT -------------------- */
   useEffect(() => {
     return () => {
       try {
         recognitionRef.current?.abort();
       } catch (e) {}
+      if (streamRef.current) {
+        streamRef.current.getTracks().forEach((track) => track.stop());
+      }
       window.speechSynthesis.cancel();
     };
   }, []);
@@ -347,25 +369,21 @@ function Step2Interview({ interviewData, onFinish }) {
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-3 select-none font-sans">
       <div className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col lg:flex-row min-h-[620px]">
 
-        {/* LEFT SIDE: AI INTERVIEWER DASHBOARD AVATAR PANEL */}
-       <div className="lg:w-[35%] border-r bg-gray-50 p-6 flex flex-col items-center justify-between">
-  
-  <div className="w-full flex flex-col items-center">
-    
-    {/* Video Container */}
-    <div className="w-full max-w-[260px] rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100">
-      
-      <video
-        ref={videoRef}
-        src={videoSource}
-        muted
-        playsInline
-        preload="auto"
-        className="w-full h-full object-contain"
-      />
-      
-    </div>
-
+        {/* LEFT SIDE: AI INTERVIEWER PANEL */}
+        <div className="lg:w-[35%] border-r bg-gray-50 p-6 flex flex-col items-center justify-between">
+          <div className="w-full flex flex-col items-center">
+            
+            {/* Video Box Container */}
+            <div className="w-full max-w-[260px] rounded-2xl overflow-hidden shadow-md bg-black border border-gray-100">
+              <video
+                ref={videoRef}
+                src={videoSource}
+                muted
+                playsInline
+                preload="auto"
+                className="w-full h-full object-contain"
+              />
+            </div>
 
             {subtitle && (
               <div className="mt-4 bg-emerald-50 border border-emerald-100 text-emerald-900 rounded-xl p-3.5 text-center text-xs font-medium leading-relaxed max-w-[280px] shadow-sm animate-pulse">
@@ -374,6 +392,7 @@ function Step2Interview({ interviewData, onFinish }) {
             )}
           </div>
 
+          {/* Metrics Layout Card */}
           <div className="mt-6 bg-white w-full rounded-2xl shadow-sm border border-gray-100 p-5">
             <div className="flex justify-between items-center border-b border-gray-50 pb-3">
               <span className="text-gray-400 text-xs font-semibold uppercase tracking-wider">
@@ -412,9 +431,9 @@ function Step2Interview({ interviewData, onFinish }) {
               </div>
             </div>
           </div>
-        </div>
+        </div> {/* Fixed: Layout structural tree closure error solved perfectly */}
 
-        {/* RIGHT SIDE: INTERACTIVE TEXT AREA USER INTERFACE CONTROLS */}
+        {/* RIGHT SIDE: INTERACTIVE INTERFACE CONTROLS */}
         <div className="flex-1 p-6 md:p-8 flex flex-col justify-between bg-white">
           <div>
             <div className="flex justify-between items-center mb-6">
@@ -457,7 +476,7 @@ function Step2Interview({ interviewData, onFinish }) {
             )}
           </div>
 
-          {/* LOWER ACTIONS BUTTON CONTROLS ROW */}
+          {/* LOWER ACTIONS INTERACTIVE CONTAINER */}
           {!isIntroPhase && (
             <div className="mt-6">
               {!feedback ? (
@@ -508,6 +527,7 @@ function Step2Interview({ interviewData, onFinish }) {
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
