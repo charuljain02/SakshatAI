@@ -10,7 +10,7 @@ import { BsArrowRight } from "react-icons/bs";
 
 import Timer from "./Timer";
 
-const ServerUrl = "http://localhost:8000";
+const ServerUrl = "https://sakshatai-client.onrender.com";
 
 function Step2Interview({ interviewData, onFinish }) {
   const { interviewId, questions = [], userName } = interviewData;

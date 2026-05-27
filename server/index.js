@@ -21,8 +21,10 @@ const app = express();
 
 app.use(
   cors({
+
     origin: "https://sakshatai-client.onrender.com",
-    credentials: true,
+
+      credentials: true,
   })
 );
 
