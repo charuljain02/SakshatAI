@@ -12,7 +12,7 @@ import { useDispatch } from 'react-redux';
 import { setUserData } from './redux/userSlice';
 import Pricing from './pages/Pricing';
 
-export const ServerUrl = "http://localhost:8000";
+export const ServerUrl = "https://sakshatai.onrender.com";
 
 axios.defaults.withCredentials = true;
 
