@@ -29,7 +29,7 @@ function Navbar() {
         try {
 
             await axios.get(
-                serverUrl + "api/auth/logout",
+                serverUrl + "/api/auth/logout",
                 { withCredentials: true }
             )
 
