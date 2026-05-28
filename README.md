@@ -9,6 +9,16 @@ https://sakshatai-client.onrender.com/
 
 ---
 
+## Screenshots
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/8558f436-ab99-43d7-812e-e498f106fdb6" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/55d0c46b-0e7a-492e-8017-9626652a36ed" />
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/d6805ae9-a6c5-4f6e-9308-7d29ec90532f" />
+
+
+
+
+---
+
 ## 📌 Overview
 
 SakshatAI is a full-stack AI interview simulator designed to replicate real-world technical interview experiences.
@@ -195,13 +205,15 @@ OPENROUTER_API_KEY=your_api_key
 PORT=5000
 ```
 ---
-### 📈 Future Improvements
-💰 Payment gateway integration (Razorpay / Stripe)
-📊 Analytics dashboard for user performance
-🧑‍💼 Resume-based adaptive interviews
-🎯 Difficulty selection system
-🧠 Emotion / confidence detection system
-🌐 WebSocket real-time interviewer
+## 📈Future Improvements
+
+-💰 Payment gateway integration (Razorpay / Stripe)
+-📊 Analytics dashboard for user performance
+-🧑‍💼 Resume-based adaptive interviews
+-🎯 Difficulty selection system
+-🧠 Emotion / confidence detection system
+-🌐 WebSocket real-time interviewer
+
 ---
 ### 👨‍💻 Author
 Charul Jain
