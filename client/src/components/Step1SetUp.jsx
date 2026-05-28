@@ -33,7 +33,7 @@ function Step1SetUp({ onStart }) {
   const [analysisDone, setAnalysisDone] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
 
-  const ServerUrl = "https://sakshatai-client.onrender.com";
+  const ServerUrl = "https://sakshatai.onrender.com";
 
   /* -------------------- RESUME ANALYSIS -------------------- */
 

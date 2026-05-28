@@ -158,10 +158,6 @@ return res.json({
    GENERATE QUESTIONS
 ========================================================= */
 
-/* =========================================================
-   GENERATE QUESTIONS
-========================================================= */
-
 export const generateQuestion = async (req, res) => {
 console.log("REQ USER ID:", req.userId);
   try {
@@ -403,166 +399,156 @@ Difficulty:
 ========================================================= */
 
 export const submitAnswer = async (req, res) => {
-
   try {
+    const { interviewId, questionIndex, answer, timeTaken } = req.body;
 
-    const {
-      interviewId,
-      questionIndex,
-      answer,
-      timeTaken,
-    } = req.body;
+    /* ---------------- SAFE INPUT CHECK ---------------- */
+    if (!interviewId || questionIndex === undefined) {
+      return res.status(400).json({
+        message: "Missing interviewId or questionIndex",
+      });
+    }
 
     const interview = await Interview.findById(interviewId);
 
     if (!interview) {
-
       return res.status(404).json({
         message: "Interview not found",
       });
     }
 
-    const question =
-      interview.questions[questionIndex];
+    const question = interview?.questions?.[questionIndex];
 
     if (!question) {
-
       return res.status(400).json({
         message: "Invalid question index",
       });
     }
 
-    // EMPTY ANSWER
+    /* ---------------- EMPTY ANSWER ---------------- */
     if (!answer || !answer.trim()) {
-
       question.score = 0;
-      question.feedback =
-        "You did not submit an answer.";
+      question.feedback = "You did not submit an answer.";
       question.answer = "";
 
       await interview.save();
 
-      return res.json({
+      return res.status(200).json({
         feedback: question.feedback,
+        score: 0,
       });
     }
 
-    // TIME LIMIT EXCEEDED
-    if (timeTaken > question.timeLimit) {
+    /* ---------------- TIME LIMIT CHECK ---------------- */
+    const safeTimeLimit = question.timeLimit || 60;
 
+    if (timeTaken > safeTimeLimit) {
       question.score = 0;
-
-      question.feedback =
-        "Time limit exceeded. Answer not evaluated.";
-
+      question.feedback = "Time limit exceeded. Answer not evaluated.";
       question.answer = answer;
 
       await interview.save();
 
-      return res.json({
+      return res.status(200).json({
         feedback: question.feedback,
+        score: 0,
       });
     }
 
+    /* ---------------- SAFE AI PROMPT ---------------- */
     const messages = [
-
       {
         role: "system",
-
         content: `
-You are a professional human interviewer evaluating a candidate's answer in a real interview.
+You are a professional human interviewer evaluating a candidate's answer.
 
-Evaluate naturally and fairly, like a real person would.
-
-Score the answer in these areas (0 to 10):
-
-1. Confidence – Does the answer sound clear, confident, and well-presented?
-2. Communication – Is the language simple, clear, and easy to understand?
-3. Correctness – Is the answer accurate, relevant, and complete?
+Score (0–10):
+1. Confidence
+2. Communication
+3. Correctness
 
 Rules:
-- Be realistic and unbiased.
-- Do not give random high scores.
-- If the answer is weak, score low.
-- If the answer is strong and detailed, score high.
-- Consider clarity, structure, and relevance.
+- Be realistic and strict.
+- No random high scores.
+- Keep feedback 10–15 words.
 
-Calculate:
-finalScore = average of confidence, communication, and correctness (rounded to nearest whole number).
-
-Feedback Rules:
-- Write natural human feedback.
-- 10 to 15 words only.
-- Sound like real interview feedback.
-- Can suggest improvement if needed.
-- Do NOT repeat the question.
-- Do NOT explain scoring.
-- Keep tone professional and honest.
-
-Return ONLY valid JSON in this format:
-
+Return ONLY valid JSON:
 {
   "confidence": number,
   "communication": number,
   "correctness": number,
   "finalScore": number,
-  "feedback": "short human feedback"
+  "feedback": "short feedback"
 }
-`,
+        `,
       },
-
       {
         role: "user",
-
         content: `
-Question: ${question.question}
+Question: ${question.question || "N/A"}
 
-Answer: ${answer}
-`,
+Answer: ${answer || "N/A"}
+        `,
       },
     ];
 
-    const aiResponse = await askAi(messages);
+    /* ---------------- AI CALL SAFETY ---------------- */
+    let aiResponse;
 
-    const parsed = JSON.parse(aiResponse);
+    try {
+      aiResponse = await askAi(messages);
+    } catch (err) {
+      console.error("AI CALL FAILED:", err);
+      return res.status(500).json({
+        message: "AI service failed",
+      });
+    }
 
-    // SAVE RESULT
+    if (!aiResponse || typeof aiResponse !== "string") {
+      return res.status(500).json({
+        message: "Invalid AI response",
+      });
+    }
+
+    /* ---------------- CLEAN AI OUTPUT ---------------- */
+    let cleaned = aiResponse
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
+
+    let parsed;
+
+    try {
+      parsed = JSON.parse(cleaned);
+    } catch (err) {
+      console.error("AI JSON PARSE ERROR:", aiResponse);
+
+      return res.status(500).json({
+        message: "AI returned invalid JSON",
+        raw: aiResponse,
+      });
+    }
+
+    /* ---------------- SAVE DATA ---------------- */
     question.answer = answer;
-
-    question.confidence =
-      parsed.confidence || 0;
-
-    question.communication =
-      parsed.communication || 0;
-
-    question.correctness =
-      parsed.correctness || 0;
-
-    question.score =
-      parsed.finalScore || 0;
-
-    question.feedback =
-      parsed.feedback || "";
+    question.confidence = parsed.confidence || 0;
+    question.communication = parsed.communication || 0;
+    question.correctness = parsed.correctness || 0;
+    question.score = parsed.finalScore || 0;
+    question.feedback = parsed.feedback || "";
 
     await interview.save();
 
+    /* ---------------- RESPONSE ---------------- */
     return res.status(200).json({
-
-      feedback: parsed.feedback,
-
-      score: parsed.finalScore,
-
-      confidence: parsed.confidence,
-
-      communication: parsed.communication,
-
-      correctness: parsed.correctness,
-
+      feedback: question.feedback,
+      score: question.score,
+      confidence: question.confidence,
+      communication: question.communication,
+      correctness: question.correctness,
     });
-
   } catch (error) {
-
-    console.log(error);
+    console.error("❌ SUBMIT ANSWER ERROR:", error);
 
     return res.status(500).json({
       message: `Failed to submit answer: ${error.message}`,
