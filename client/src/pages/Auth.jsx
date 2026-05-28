@@ -10,8 +10,7 @@ import { useDispatch } from 'react-redux';
 import { setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
 
-const ServerUrl = "https://sakshatai-client.onrender.com";
-
+const ServerUrl = "https://sakshatai.onrender.com";
 axios.defaults.withCredentials = true;
 
 function Auth() {

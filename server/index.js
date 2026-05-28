@@ -11,22 +11,59 @@ import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.route.js";
 import interviewRouter from "./routes/interview.route.js";
 
-// OPTIONAL
-// import isAuth from "./middlewares/isAuth.js";
-
 const app = express();
 
 
+// ================= DATABASE =================
+
+connectDb();
+
+
+// ================= CORS =================
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://sakshatai-client.onrender.com",
+];
+
+const corsOptions = {
+  origin: function (origin, callback) {
+
+    // Allow requests with no origin
+    // (Postman, mobile apps, etc.)
+    if (!origin) {
+      return callback(null, true);
+    }
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+
+  credentials: true,
+
+  methods: [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS"
+  ],
+
+  allowedHeaders: [
+    "Content-Type",
+    "Authorization"
+  ]
+};
+
+app.use(cors(corsOptions));
+
+app.options("*", cors(corsOptions));
+
+
 // ================= MIDDLEWARES =================
-
-app.use(
-  cors({
-
-    origin: "https://sakshatai-client.onrender.com",
-
-      credentials: true,
-  })
-);
 
 app.use(express.json());
 
@@ -54,9 +91,7 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 8000;
 
 
-// ================= DATABASE + SERVER =================
-
-connectDb();
+// ================= SERVER =================
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
