@@ -1,190 +1,213 @@
-# 🚀 SakshatAI — AI-Powered Interview Simulator
+# 🚀 SakshatAI — AI Interview Simulator
 
-> A real-time AI interview platform that simulates technical interviews using speech recognition, AI-driven questioning (OpenRouter), and automated evaluation with feedback generation.
+A production-style AI-powered interview preparation platform that simulates real technical interviews using voice interaction, LLM-based evaluation, and structured interview flow.
 
 ---
 
-## 🎯 Overview
+## 🌐 Live Demo
+https://sakshatai-client.onrender.com/
 
-SakshatAI is a full-stack AI interview platform designed to replicate real-world technical interview experiences.
+---
 
-It enables users to:
-- Speak answers naturally using voice input 🎤  
-- Receive AI-generated questions 🤖  
-- Get instant feedback using LLM evaluation 🧠  
-- Experience timed, structured interview flow ⏱️  
-- Interact with an AI interviewer using voice + video avatar 🎬  
+## 📌 Overview
+
+SakshatAI is a full-stack AI interview simulator designed to replicate real-world technical interview experiences.
+
+It allows users to:
+- 🎤 Answer questions using voice or text
+- 🤖 Interact with an AI interviewer
+- 🧠 Receive AI-generated feedback and scoring
+- ⏱️ Experience timed interview sessions
+- 🎬 Engage with a realistic interview flow system
 
 ---
 
 ## ✨ Key Features
 
-### 🤖 AI Interviewer (OpenRouter Powered)
-- Uses OpenRouter API to access multiple LLMs (GPT, Claude, Mistral, etc.)
-- Generates contextual interview questions
-- Evaluates user answers intelligently
-- Provides structured feedback and improvement tips
+### 🤖 AI Interview Engine
+- Powered by OpenRouter API
+- Uses LLMs (GPT / Claude / Mistral)
+- Generates contextual technical questions
+- Evaluates answers intelligently
 
 ---
 
-### 🎙️ Voice-Based Interaction System
-- Real-time speech-to-text using Web Speech API
-- AI speaks questions using Speech Synthesis API
-- Continuous microphone listening with smart restart handling
+### 🎙️ Voice Interaction System
+- Speech-to-text (Web Speech API)
+- Text-to-speech AI interviewer
+- Continuous microphone handling
 - Hybrid input support (voice + text)
 
 ---
 
-### ⏱️ Interview Flow Engine
-- Structured question-by-question flow
-- Automatic timer per question
-- Auto-submit on timeout
-- Controlled progression system:
+### ⏱️ Interview Flow System
+Structured flow:
 
-Intro → Question → Answer → AI Feedback → Next Question
+Intro → Question → Answer → Evaluation → Next Question
+
+- Timer-based questions
+- Auto progression system
+- Controlled interview lifecycle
 
 ---
 
 ### 🧠 AI Evaluation System
-Each answer is processed by an LLM via OpenRouter:
+Each answer is analyzed using LLM:
+
 - Score (0–10)
-- Feedback analysis
-- Improvement suggestions
+- Feedback
 - Communication assessment
+- Improvement suggestions
 
 ---
 
-### 🎬 AI Avatar Experience
-- Male/Female AI video avatars
-- Synchronized with AI speech state
-- Creates immersive interview environment
+### 🎬 AI Interview Experience
+- AI voice responses
+- Avatar-based UI experience
+- Real-time conversational feel
+- Interview simulation environment
 
 ---
 
 ## 🧱 Tech Stack
 
 ### Frontend
-- React.js
+- React.js (Vite)
 - Tailwind CSS
-- Framer Motion
+- Redux Toolkit
 - Axios
+- Framer Motion
+- React Router DOM
 - Web Speech API
+- Recharts
 - React Icons
 
 ### Backend
 - Node.js
 - Express.js
+- MongoDB (Mongoose)
+- JWT Authentication
 - REST APIs
-- OpenRouter API Integration
+- Multer
 
-### AI Layer
+### AI Integration
 - OpenRouter API
 - GPT / Claude / Mistral models
+
+### Deployment
+- Frontend: Render
+- Backend: Render
 
 ---
 
 ## 🏗️ System Architecture
+<img width="1452" height="1440" alt="image" src="https://github.com/user-attachments/assets/46971b66-bf27-48ed-8a30-5ce8049e4957" />
 
-User (Voice/Text)
-        ↓
-React Frontend
-        ↓
-Express Backend
-        ↓
-OpenRouter LLM
-        ↓
-AI Evaluation (Score + Feedback)
-        ↓
-Frontend UI Update
-
-
-
+ 
 ---
 
 ## 🔌 API Endpoints
 
 ### Submit Answer
+```http
 POST /api/interview/submit-answer
-
-Request Body:
 {
   "interviewId": "string",
   "questionIndex": 0,
   "answer": "string",
   "timeTaken": 45
 }
-
----
-
-### Finish Interview
+Finish Interview
 POST /api/interview/finish
-
-Request Body:
 {
   "interviewId": "string"
 }
+```
+
+## 🧠 How It Works
+
+- User starts interview session  
+- AI generates structured questions  
+- User answers via voice/text  
+- Backend sends response to OpenRouter  
+- AI evaluates:
+  - Score (0–10)  
+  - Feedback  
+  - Improvement tips  
+- Result is displayed instantly  
+- Next question continues flow  
+- Final report is generated  
 
 ---
 
-## 🧠 OpenRouter Integration
+## 💳 Credit System
 
-POST https://openrouter.ai/api/v1/chat/completions
-
-System Prompt:
-"You are an expert technical interviewer. Evaluate answers strictly."
-
-Output:
-- Score (0–10)
-- Feedback
-- Improvement tips
-
----
-
-## 🚀 How It Works
-
-1. User starts interview session
-2. AI introduces interview flow
-3. AI asks question using voice + avatar
-4. User responds using mic or typing
-5. Answer is sent to backend
-6. OpenRouter evaluates response
-7. Feedback is displayed instantly
-8. Next question begins
-9. Final interview summary is generated
+- Users receive free credits  
+- Each interview consumes credits  
+- No payment integration yet (MVP stage)  
+- System designed for future Stripe/Razorpay integration  
 
 ---
 
 ## 🔥 Highlights
 
-- Real-time AI voice interviewer
-- Speech-to-text system
-- LLM-based evaluation
-- Fully automated interview flow
-- Human-like conversational experience
-- Production-style architecture
+- Real-time AI interviewer experience  
+- Voice-based interaction system  
+- LLM-powered evaluation engine  
+- Fully automated interview lifecycle  
+- SaaS-ready scalable architecture  
+- Production deployment on Render  
 
 ---
 
-## 📌 Future Improvements
+## 📁 Project Structure
 
-- Resume-based dynamic questions
-- WebSocket real-time AI interviewer
-- Recruiter dashboard
-- Emotion detection system
-- Multi-round interview system
+```bash id="project_structure"
+client/   → React frontend
+server/   → Express backend
+```
+```
+🚀 Local Setup
+Clone repository
+git clone https://github.com/your-username/SakshatAI.git
+Install dependencies
 
+Frontend:
+
+cd client
+npm install
+npm run dev
+
+Backend:
+
+cd server
+npm install
+npm run dev
+```
+```
+🔐 Environment Variables
+
+Create .env file in server/:
+
+MONGO_URI=your_mongodb_url
+JWT_SECRET=your_secret
+OPENROUTER_API_KEY=your_api_key
+PORT=5000
+```
 ---
-
-## 🧑‍💻 Author
-
-Charul Jain  
-Full Stack Developer | AI Enthusiast  
-
+### 📈 Future Improvements
+💰 Payment gateway integration (Razorpay / Stripe)
+📊 Analytics dashboard for user performance
+🧑‍💼 Resume-based adaptive interviews
+🎯 Difficulty selection system
+🧠 Emotion / confidence detection system
+🌐 WebSocket real-time interviewer
 ---
+### 👨‍💻 Author
+Charul Jain
 
-## ⭐ Project Status
-
-Active Development 🚧  
-Ready for deployment 🚀  
-
----
+GitHub: https://github.com/charuljain02
+⭐ Project Status
+🚧 Actively Maintained
+🚀 Production MVP Completed
+📌 Ready for Internship / Portfolio Showcase
