@@ -11,7 +11,7 @@ import InterviewReport from './pages/InterviewReport';
 import { useDispatch } from 'react-redux';
 import { setUserData } from './redux/userSlice';
 import Pricing from './pages/Pricing';
-
+import GithubAnalyzer from './components/GithubAnalyzer';
 export const ServerUrl = "https://sakshatai.onrender.com";
 
 axios.defaults.withCredentials = true;
@@ -72,6 +72,7 @@ dispatch(setUserData(null));
       />
 
       <Route path="/pricing" element={<Pricing />} />
+      <Route path="/analyzer" element={<GithubAnalyzer />} />
 
     </Routes>
   );

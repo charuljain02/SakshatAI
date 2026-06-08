@@ -1,18 +1,29 @@
+
 import React, { useState } from 'react'
 import { FaArrowLeft, FaCheckCircle, FaWallet, FaSpinner, FaTimesCircle } from 'react-icons/fa'
 import { useNavigate } from 'react-router-dom'
-
+import { useDispatch, useSelector } from 'react-redux'
+import { setUserData } from '../redux/userSlice'
+import { updateCredits } from "../redux/userSlice";
 function Pricing() {
   const navigate = useNavigate()
-  
+
+  const dispatch = useDispatch()
+
+  const { userData } = useSelector(
+    (state) => state.user
+  )
+
   const [selectedPlan, setSelectedPlan] = useState("free")
   const [loading, setLoading] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [addedCredits, setAddedCredits] = useState(0)
   
   // Local wallet simulation matching your navbar display
-  const [currentCredits, setCurrentCredits] = useState(100)
-
+  const currentCredits =
+  Number(localStorage.getItem("credits")) ||
+  userData?.credits ||
+  100;
   const plans = [
     {
       id: "free",
@@ -57,21 +68,36 @@ function Pricing() {
     }
   ]
 
-  // Smart Move: Simulating the successful payment loop safely
   const handleMockPayment = (plan) => {
-    setLoading(true)
-    
-    // Simulate server response delay (1.5 seconds)
-    setTimeout(() => {
-      setLoading(false)
-      setAddedCredits(plan.credits)
-      setCurrentCredits(prev => prev + plan.credits)
-      setShowSuccessModal(true)
-      
-      // NOTEFOR RECRUITER: If your backend has an endpoint like /api/users/update-credits,
-      // you could optionally fire a quick axios.post request here to persist it in MongoDB.
-    }, 1500)
-  }
+
+  setLoading(true);
+
+  setTimeout(() => {
+
+    const currentCredits =
+      Number(localStorage.getItem("credits")) ||
+      userData?.credits ||
+      100;
+
+    const newCredits =
+      currentCredits + plan.credits;
+
+    localStorage.setItem(
+      "credits",
+      newCredits
+    );
+
+    dispatch(updateCredits(newCredits));
+
+    setAddedCredits(plan.credits);
+
+    setLoading(false);
+
+    setShowSuccessModal(true);
+
+  }, 1500);
+
+};
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-gray-50 to-emerald-50 py-16 px-6 relative font-sans select-none'>
@@ -90,7 +116,7 @@ function Pricing() {
           <FaWallet className='text-emerald-500' />
           <span>Credits:</span>
           <span className='font-bold text-gray-900 bg-gray-100 px-2.5 py-0.5 rounded-md text-sm animate-bounce'>
-            {currentCredits}
+{userData?.credits || 0}
           </span>
         </div>
       </div>
@@ -155,15 +181,15 @@ function Pricing() {
                 </p>
 
                 <div className="mt-8 space-y-3.5 text-left border-t border-gray-100 pt-6">
-                  {plans[2].features.map((feature, i) => (
-                    <div key={i} className="flex items-start gap-3">
-                      <FaCheckCircle className="text-emerald-500 text-sm mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-600 text-sm font-medium">
-                        {plan.features[i] || "Advanced Feature Access"}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+  {plan.features.map((feature, i) => (
+    <div key={i} className="flex items-start gap-3">
+      <FaCheckCircle className="text-emerald-500 text-sm mt-0.5 flex-shrink-0" />
+      <span className="text-gray-600 text-sm font-medium">
+        {feature}
+      </span>
+    </div>
+  ))}
+</div>
               </div>
 
               {!plan.default && (

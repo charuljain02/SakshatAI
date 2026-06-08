@@ -7,7 +7,8 @@ import {
   BsMic,
   BsClock,
   BsBarChart,
-  BsFileEarmarkText
+  BsFileEarmarkText,
+  BsGithub // Imported for the new fancy section
 } from "react-icons/bs";
 import { HiSparkles } from "react-icons/hi";
 import AuthModal from '../components/AuthModal';
@@ -47,7 +48,7 @@ function Home() {
         </div>
 
         {/* HERO SECTION */}
-        <div className="text-center mb-28">
+        <div className="text-center mb-16">
 
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
@@ -112,6 +113,72 @@ function Home() {
 
           </div>
         </div>
+
+        {/* NEW FEATURE: GITHUB PROFILE ANALYZER SECTION */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.2 }}
+          className="mb-28 max-w-4xl mx-auto"
+        >
+          <div className="relative group bg-gradient-to-br from-white via-white to-green-50/30 rounded-3xl p-8 md:p-10 border-2 border-green-100 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
+            
+            {/* Fancy ambient accent blobs */}
+            <div className="absolute top-0 right-0 w-40 h-40 bg-green-200/20 rounded-full blur-3xl group-hover:bg-green-300/30 transition-all duration-500 pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gray-200/30 rounded-full blur-3xl pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+              
+              {/* Text Context & Left Info */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-full mb-4 shadow-sm">
+                  <BsGithub size={14} className="animate-pulse" />
+                  <span>NEW CAPABILITY</span>
+                </div>
+                
+                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-3">
+                  AI GitHub Profile <span className="text-green-600">Analyzer</span>
+                </h2>
+                
+                <p className="text-gray-500 text-sm md:text-base max-w-xl leading-relaxed">
+                  Transform your open-source presence into actionable career intelligence. Scan your repositories, calculate readiness scores, evaluate documentation quality, and instantly unlock optimized technical interview trajectories.
+                </p>
+              </div>
+
+              {/* Action Side Box */}
+              <div className="flex flex-col items-center justify-center min-w-[240px] w-full md:w-auto bg-gray-50 border border-gray-100 p-6 rounded-2xl text-center">
+                <div className="relative w-14 h-14 bg-white border border-green-200 text-green-600 rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <BsGithub size={28} />
+                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                  </span>
+                </div>
+                
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
+                  Profile Insights Coach
+                </span>
+
+                <motion.button
+                  onClick={() => {
+                    if (!userData) {
+                      setAuthMessage("Login to unlock the GitHub Profile Analyzer");
+                      navigate("/auth");
+                      return;
+                    }
+                    navigate("/analyzer");
+                  }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-green-600 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-green-700 transition shadow-md shadow-green-600/10"
+                >
+                  Analyze My Profile
+                </motion.button>
+              </div>
+
+            </div>
+          </div>
+        </motion.div>
 
         {/* STEPS SECTION */}
         <div className="flex flex-col md:flex-row justify-center items-center gap-10 mb-28">

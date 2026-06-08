@@ -10,7 +10,7 @@ import connectDb from "./config/connectDb.js";
 import authRouter from "./routes/auth.routes.js";
 import userRouter from "./routes/user.route.js";
 import interviewRouter from "./routes/interview.route.js";
-
+import githubRoutes from "./routes/github.route.js";
 const app = express();
 
 
@@ -78,6 +78,7 @@ app.use("/api/user", userRouter);
 app.use("/api/interview", interviewRouter);
 
 
+app.use("/api/github", githubRoutes);
 // ================= TEST ROUTE =================
 
 app.get("/", (req, res) => {

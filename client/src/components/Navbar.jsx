@@ -12,7 +12,8 @@ import axios from "axios"
 import { setUserData } from '../redux/userSlice'
 import { serverUrl } from '../main'
 import AuthModal from './AuthModal'
-
+import { useEffect } from "react";
+import { updateCredits } from "../redux/userSlice";
 function Navbar() {
 
     const { userData } = useSelector((state) => state.user)
@@ -20,6 +21,26 @@ function Navbar() {
     const [showCreditPopup, setShowCreditPopup] = useState(false)
     const [showUserPopup, setShowUserPopup] = useState(false)
     const [showAuth, setShowAuth] = useState(false)
+   
+    useEffect(() => {
+
+  const savedCredits =
+    localStorage.getItem("credits");
+
+  if (
+    savedCredits &&
+    userData
+  ) {
+
+    dispatch(
+      updateCredits(
+        Number(savedCredits)
+      )
+    );
+
+  }
+
+}, []);
 
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -88,8 +109,11 @@ function Navbar() {
                             }}
                             className='flex items-center gap-2 bg-gray-100 px-4 py-2 rounded-full text-md hover:bg-gray-200 transition'
                         >
+                            {/* <BsCoin size={18} />
+                            {userData?.credits || 0} */}
+                            {/* //to avoid conflict */}
                             <BsCoin size={18} />
-                            {userData?.credits || 0}
+
                         </button>
 
                         {showCreditPopup && (

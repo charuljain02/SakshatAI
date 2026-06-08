@@ -12,7 +12,7 @@ import axios from "axios";
 
 import { useSelector, useDispatch } from "react-redux";
 import { setUserData } from "../redux/userSlice";
-
+import CreatableSelect from "react-select/creatable";
 function Step1SetUp({ onStart }) {
 
   const dispatch = useDispatch();
@@ -130,7 +130,34 @@ function Step1SetUp({ onStart }) {
 
     }
   };
+  const roleOptions = [
+  { value: "Frontend Developer", label: "Frontend Developer" },
+  { value: "Backend Developer", label: "Backend Developer" },
+  { value: "Full Stack Developer", label: "Full Stack Developer" },
+  { value: "Software Engineer", label: "Software Engineer" },
+  { value: "Product Manager", label: "Product Manager" },
+  { value: "Data Analyst", label: "Data Analyst" },
+  { value: "Data Scientist", label: "Data Scientist" },
+  { value: "AI Engineer", label: "AI Engineer" },
+  { value: "Machine Learning Engineer", label: "Machine Learning Engineer" },
+  { value: "DevOps Engineer", label: "DevOps Engineer" },
+  { value: "Cloud Engineer", label: "Cloud Engineer" },
+  { value: "Cyber Security Analyst", label: "Cyber Security Analyst" },
+  { value: "Mobile App Developer", label: "Mobile App Developer" },
+  { value: "UI/UX Designer", label: "UI/UX Designer" },
+  { value: "QA Engineer", label: "QA Engineer" },
+  { value: "Business Analyst", label: "Business Analyst" },
+];
 
+const experienceOptions = [
+  { value: "Student", label: "Student" },
+  { value: "Fresher", label: "Fresher" },
+  { value: "Intern", label: "Intern" },
+  { value: "0-1 Years", label: "0-1 Years" },
+  { value: "1-2 Years", label: "1-2 Years" },
+  { value: "2-4 Years", label: "2-4 Years" },
+  { value: "5+ Years", label: "5+ Years" },
+];
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -219,36 +246,74 @@ function Step1SetUp({ onStart }) {
 
             {/* ROLE INPUT */}
 
-            <div className="relative">
+          <div className="relative">
+  <div className="absolute left-4 top-4 z-10 text-gray-400">
+    <FaUserTie />
+  </div>
 
-              <FaUserTie className="absolute top-4 left-4 text-gray-400" />
-
-              <input
-                type="text"
-                placeholder="Enter role"
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                onChange={(e) => setRole(e.target.value)}
-                value={role}
-              />
-
-            </div>
+  <CreatableSelect
+    options={roleOptions}
+    placeholder="Select or type a role..."
+    value={
+      role
+        ? { value: role, label: role }
+        : null
+    }
+    onChange={(selectedOption) =>
+      setRole(selectedOption?.value || "")
+    }
+    isClearable
+    isSearchable
+    formatCreateLabel={(inputValue) =>
+      `Use "${inputValue}"`
+    }
+    className="text-sm"
+    styles={{
+      control: (provided) => ({
+        ...provided,
+        minHeight: "52px",
+        paddingLeft: "35px",
+        borderRadius: "12px",
+        borderColor: "#e5e7eb",
+        boxShadow: "none",
+      }),
+    }}
+  />
+</div>
 
             {/* EXPERIENCE INPUT */}
 
-            <div className="relative">
+           <div className="relative">
+  <div className="absolute left-4 top-4 z-10 text-gray-400">
+    <FaBriefcase />
+  </div>
 
-              <FaBriefcase className="absolute top-4 left-4 text-gray-400" />
-
-              <input
-                type="text"
-                placeholder="Experience"
-                className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                onChange={(e) => setExperience(e.target.value)}
-                value={experience}
-              />
-
-            </div>
-
+  <CreatableSelect
+    options={experienceOptions}
+    placeholder="Select or type experience..."
+    value={
+      experience
+        ? { value: experience, label: experience }
+        : null
+    }
+    onChange={(selectedOption) =>
+      setExperience(selectedOption?.value || "")
+    }
+    isClearable
+    isSearchable
+    className="text-sm"
+    styles={{
+      control: (provided) => ({
+        ...provided,
+        minHeight: "52px",
+        paddingLeft: "35px",
+        borderRadius: "12px",
+        borderColor: "#e5e7eb",
+        boxShadow: "none",
+      }),
+    }}
+  />
+</div>
             {/* MODE SELECT */}
 
             <select
