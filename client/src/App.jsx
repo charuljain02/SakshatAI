@@ -12,6 +12,8 @@ import { useDispatch } from 'react-redux';
 import { setUserData } from './redux/userSlice';
 import Pricing from './pages/Pricing';
 import GithubAnalyzer from './components/GithubAnalyzer';
+import AtsScoreChecker from './components/AtsScoreChecker';
+
 export const ServerUrl = "https://sakshatai.onrender.com";
 
 axios.defaults.withCredentials = true;
@@ -73,6 +75,7 @@ dispatch(setUserData(null));
 
       <Route path="/pricing" element={<Pricing />} />
       <Route path="/analyzer" element={<GithubAnalyzer />} />
+      <Route path="/ats" element={<AtsScoreChecker />} />
 
     </Routes>
   );
