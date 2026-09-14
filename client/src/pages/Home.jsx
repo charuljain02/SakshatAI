@@ -8,8 +8,9 @@ import {
   BsClock,
   BsBarChart,
   BsFileEarmarkText,
-  BsGithub ,
-  BsPercent
+  BsGithub,
+  BsPercent,
+  BsArrowRight
 } from "react-icons/bs";
 import { HiSparkles } from "react-icons/hi";
 import AuthModal from '../components/AuthModal';
@@ -33,6 +34,57 @@ function Home() {
   const [authMessage, setAuthMessage] = useState("");
 
   const navigate = useNavigate()
+
+  // Shared data for the two AI tool cards, so both render from one consistent template
+  const aiTools = [
+    {
+      key: "github",
+      badge: "NEW CAPABILITY",
+      badgeIcon: <BsGithub size={13} className="animate-pulse" />,
+      icon: <BsGithub size={26} />,
+      title: "AI GitHub Profile",
+      titleAccent: "Analyzer",
+      desc: "Transform your open-source presence into actionable career intelligence. Scan your repositories, calculate readiness scores, and unlock optimized interview trajectories.",
+      tag: "Profile Insights Coach",
+      cta: "Analyze My Profile",
+      authMsg: "Login to unlock the GitHub Profile Analyzer",
+      route: "/analyzer",
+      accent: "indigo",
+    },
+    {
+      key: "ats",
+      badge: "NEW CAPABILITY",
+      badgeIcon: <BsPercent size={13} className="animate-pulse" />,
+      icon: <BsFileEarmarkText size={26} />,
+      title: "AI ATS Score",
+      titleAccent: "Checker",
+      desc: "Upload your resume alongside a job description to see exactly how an ATS would score it — matched and missing keywords, formatting flags, and concrete fixes.",
+      tag: "Resume Match Coach",
+      cta: "Check My ATS Score",
+      authMsg: "Login to unlock the ATS Score Checker",
+      route: "/ats",
+      accent: "green",
+    },
+  ];
+
+  const accentClasses = {
+    indigo: {
+      iconWrap: "bg-white border-indigo-200 text-indigo-600",
+      ping: "bg-indigo-400",
+      dot: "bg-indigo-500",
+      titleSpan: "text-indigo-600",
+      button: "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/10",
+      blob: "bg-indigo-200/25 group-hover:bg-indigo-300/35",
+    },
+    green: {
+      iconWrap: "bg-white border-green-200 text-green-600",
+      ping: "bg-green-400",
+      dot: "bg-green-500",
+      titleSpan: "text-green-600",
+      button: "bg-green-600 hover:bg-green-700 shadow-green-600/10",
+      blob: "bg-green-200/25 group-hover:bg-green-300/35",
+    },
+  };
 
   return (
     <div className='min-h-screen bg-[#f3f3f3] flex flex-col'>
@@ -115,139 +167,101 @@ function Home() {
           </div>
         </div>
 
-        {/* NEW FEATURE: GITHUB PROFILE ANALYZER SECTION */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.2 }}
-          className="mb-28 max-w-4xl mx-auto"
-        >
-          <div className="relative group bg-gradient-to-br from-white via-white to-green-50/30 rounded-3xl p-8 md:p-10 border-2 border-green-100 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden">
-            
-            {/* Fancy ambient accent blobs */}
-            <div className="absolute top-0 right-0 w-40 h-40 bg-green-200/20 rounded-full blur-3xl group-hover:bg-green-300/30 transition-all duration-500 pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-gray-200/30 rounded-full blur-3xl pointer-events-none" />
+        {/* AI TOOLS SECTION — GitHub Analyzer + ATS Score Checker, unified layout */}
+        <div className="mb-32">
 
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-              
-              {/* Text Context & Left Info */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-full mb-4 shadow-sm">
-                  <BsGithub size={14} className="animate-pulse" />
-                  <span>NEW CAPABILITY</span>
-                </div>
-                
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 tracking-tight mb-3">
-                  AI GitHub Profile <span className="text-green-600">Analyzer</span>
-                </h2>
-                
-                <p className="text-gray-500 text-sm md:text-base max-w-xl leading-relaxed">
-                  Transform your open-source presence into actionable career intelligence. Scan your repositories, calculate readiness scores, evaluate documentation quality, and instantly unlock optimized technical interview trajectories.
-                </p>
-              </div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="text-center mb-12"
+          >
+            <h2 className='text-3xl md:text-4xl font-semibold'>
+              Go Beyond the{" "}
+              <span className='text-green-600'>Interview</span>
+            </h2>
+            <p className="text-gray-500 mt-4 max-w-xl mx-auto">
+              Two AI tools that prep you before you even walk into the room.
+            </p>
+          </motion.div>
 
-              {/* Action Side Box */}
-              <div className="flex flex-col items-center justify-center min-w-[240px] w-full md:w-auto bg-gray-50 border border-gray-100 p-6 rounded-2xl text-center">
-                <div className="relative w-14 h-14 bg-white border border-green-200 text-green-600 rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <BsGithub size={28} />
-                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                  </span>
-                </div>
-                
-                <span className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-4">
-                  Profile Insights Coach
-                </span>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
 
-                <motion.button
-                  onClick={() => {
-                    if (!userData) {
-                      setAuthMessage("Login to unlock the GitHub Profile Analyzer");
-                      navigate("/auth");
-                      return;
-                    }
-                    navigate("/analyzer");
-                  }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-green-600 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-green-700 transition shadow-md shadow-green-600/10"
+            {aiTools.map((tool, index) => {
+              const accent = accentClasses[tool.accent];
+
+              return (
+                <motion.div
+                  key={tool.key}
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.6, delay: index * 0.15 }}
+                  className="relative group bg-gradient-to-br from-white via-white to-gray-50 rounded-3xl p-8 border-2 border-green-100 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
                 >
-                  Analyze My Profile
-                </motion.button>
-              </div>
 
-            </div>
+                  {/* Ambient accent blob */}
+                  <div className={`absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl transition-all duration-500 pointer-events-none ${accent.blob}`} />
+
+                  <div className="relative z-10 flex flex-col flex-1">
+
+                    {/* Badge + Icon row */}
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="inline-flex items-center gap-2 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
+                        {tool.badgeIcon}
+                        <span>{tool.badge}</span>
+                      </div>
+
+                      <div className={`relative w-12 h-12 border rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 ${accent.iconWrap}`}>
+                        {tool.icon}
+                        <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${accent.ping}`}></span>
+                          <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${accent.dot}`}></span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Title + description */}
+                    <h3 className="text-2xl font-bold text-gray-900 tracking-tight mb-3">
+                      {tool.title} <span className={accent.titleSpan}>{tool.titleAccent}</span>
+                    </h3>
+
+                    <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">
+                      {tool.desc}
+                    </p>
+
+                    {/* Footer: tag + CTA, pinned to bottom for equal-height alignment */}
+                    <div className="flex items-center justify-between gap-4 pt-4 border-t border-gray-100">
+                      <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                        {tool.tag}
+                      </span>
+
+                      <motion.button
+                        onClick={() => {
+                          if (!userData) {
+                            setAuthMessage(tool.authMsg);
+                            navigate("/auth");
+                            return;
+                          }
+                          navigate(tool.route);
+                        }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                        className={`shrink-0 text-white font-medium text-sm px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-2 ${accent.button}`}
+                      >
+                        {tool.cta}
+                        <BsArrowRight size={14} />
+                      </motion.button>
+                    </div>
+
+                  </div>
+                </motion.div>
+              );
+            })}
+
           </div>
-        </motion.div>
-        
-        {/* ATS SCORE CHECKER SECTION */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25 }}
-          className="mb-32 max-w-4xl mx-auto"
-        >
-          <div className="relative group bg-gradient-to-br from-[#1c1d22] via-[#1c1d22] to-[#22242c]/50 rounded-[32px] p-8 md:p-10 border border-white/5 shadow-2xl hover:shadow-green-500/5 hover:border-white/10 transition-all duration-300 overflow-hidden">
-
-            {/* Ambient Accent Blobs */}
-            <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-[64px] group-hover:bg-green-500/15 transition-all duration-500 pointer-events-none" />
-            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-[48px] pointer-events-none" />
-
-            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
-
-              {/* Text Context & Left Info */}
-              <div className="flex-1 text-center md:text-left">
-                <div className="inline-flex items-center gap-2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full mb-4 shadow-sm">
-                  <BsPercent size={14} className="animate-pulse" />
-                  <span>NEW CAPABILITY</span>
-                </div>
-
-                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-3">
-                  AI ATS <span className="text-green-400">Score Checker</span>
-                </h2>
-
-                <p className="text-gray-400 text-sm md:text-base max-w-xl leading-relaxed">
-                  Upload your resume alongside a job description to see exactly how
-                  an Applicant Tracking System would score it — matched and missing
-                  keywords, formatting red flags, and concrete edits to boost your match.
-                </p>
-              </div>
-
-              {/* Action Side Box */}
-              <div className="flex flex-col items-center justify-center min-w-[240px] w-full md:w-auto bg-[#131418] border border-white/5 p-6 rounded-2xl text-center">
-                <div className="relative w-14 h-14 bg-[#1c1d22] border border-white/10 text-white rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
-                  <BsFileEarmarkText size={26} />
-                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
-                  </span>
-                </div>
-
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
-                  Resume Match Coach
-                </span>
-
-                <motion.button
-                  onClick={() => {
-                    if (!userData) {
-                      setAuthMessage("Login to unlock the ATS Score Checker");
-                      navigate("/auth");
-                      return;
-                    }
-                    navigate("/ats");
-                  }}
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="w-full bg-green-600 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-green-500 transition shadow-lg shadow-green-600/20"
-                >
-                  Check My ATS Score
-                </motion.button>
-              </div>
-
-            </div>
-          </div>
-        </motion.div>
+        </div>
 
         {/* STEPS SECTION */}
         <div className="flex flex-col md:flex-row justify-center items-center gap-10 mb-28">
