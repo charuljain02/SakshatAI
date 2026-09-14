@@ -11,6 +11,7 @@ import { setUserData } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
 
 const ServerUrl = "https://sakshatai.onrender.com";
+
 axios.defaults.withCredentials = true;
 
 function Auth() {
@@ -22,7 +23,7 @@ function Auth() {
 
         try {
 
-            // Firebase Google Login
+            // 1. Firebase Google Login
             const response = await signInWithPopup(auth, provider);
 
             const user = response.user;
@@ -30,8 +31,8 @@ function Auth() {
             const name = user.displayName;
             const email = user.email;
 
-            // Send user data to backend
-            const result = await axios.post(
+            // 2. Send user data to backend
+            await axios.post(
                 `${ServerUrl}/api/auth/google`,
                 {
                     name,
@@ -42,7 +43,7 @@ function Auth() {
                 }
             );
 
-            // Get current user after cookie set
+            // 3. Get logged-in user
             const currentUser = await axios.get(
                 `${ServerUrl}/api/user/current-user`,
                 {
@@ -50,18 +51,37 @@ function Auth() {
                 }
             );
 
-            // Save user in redux
+            // 4. Save user in Redux
             dispatch(setUserData(currentUser.data));
 
-            // Navigate after login
+            // 5. Go to home
             navigate("/");
 
         } catch (error) {
 
-            console.log(
-                "FULL ERROR:",
-                error.response?.data || error.message
-            );
+            console.error("LOGIN ERROR:", error);
+
+            let errorMessage = "Google login failed.";
+
+            if (error.code) {
+                errorMessage += `\n\nFirebase Error: ${error.code}`;
+            }
+
+            if (error.response) {
+
+                errorMessage += `\n\nServer Status: ${error.response.status}`;
+
+                if (error.response.data?.message) {
+                    errorMessage += `\n${error.response.data.message}`;
+                }
+
+            } else if (error.message) {
+
+                errorMessage += `\n\n${error.message}`;
+
+            }
+
+            alert(errorMessage);
 
             dispatch(setUserData(null));
         }
@@ -114,8 +134,14 @@ function Auth() {
 
                 <motion.button
                     onClick={handleGoogleAuth}
-                    whileHover={{ opacity: 0.9, scale: 1.03 }}
-                    whileTap={{ opacity: 1, scale: 0.98 }}
+                    whileHover={{
+                        opacity: 0.9,
+                        scale: 1.03
+                    }}
+                    whileTap={{
+                        opacity: 1,
+                        scale: 0.98
+                    }}
                     className='w-full flex items-center justify-center gap-3 py-3 bg-black text-white rounded-full shadow-md font-medium'
                 >
 
