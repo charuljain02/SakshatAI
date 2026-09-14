@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { useSelector } from 'react-redux'
 import { motion } from "framer-motion"
@@ -35,85 +35,103 @@ function Home() {
 
   const navigate = useNavigate()
 
-  // Shared data for the two AI tool cards, so both render from one consistent template
-  const aiTools = [
-    {
-      key: "github",
-      badge: "NEW CAPABILITY",
-      badgeIcon: <BsGithub size={13} className="animate-pulse" />,
-      icon: <BsGithub size={26} />,
-      title: "AI GitHub Profile",
-      titleAccent: "Analyzer",
-      desc: "Transform your open-source presence into actionable career intelligence. Scan your repositories, calculate readiness scores, and unlock optimized interview trajectories.",
-      tag: "Profile Insights Coach",
-      cta: "Analyze My Profile",
-      authMsg: "Login to unlock the GitHub Profile Analyzer",
-      route: "/analyzer",
-      accent: "indigo",
-    },
-    {
-      key: "ats",
-      badge: "NEW CAPABILITY",
-      badgeIcon: <BsPercent size={13} className="animate-pulse" />,
-      icon: <BsFileEarmarkText size={26} />,
-      title: "AI ATS Score",
-      titleAccent: "Checker",
-      desc: "Upload your resume alongside a job description to see exactly how an ATS would score it — matched and missing keywords, formatting flags, and concrete fixes.",
-      tag: "Resume Match Coach",
-      cta: "Check My ATS Score",
-      authMsg: "Login to unlock the ATS Score Checker",
-      route: "/ats",
-      accent: "green",
-    },
-  ];
+  // SEO metadata for the SPA page.
+  useEffect(() => {
+    const title = "SakshatAI | AI Mock Interviews, GitHub Analyzer & ATS Checker";
+    const description =
+      "Practice role-based AI mock interviews with smart follow-ups, analyze your GitHub profile, and check your resume ATS compatibility with SakshatAI.";
 
-  const accentClasses = {
-    indigo: {
-      iconWrap: "bg-white border-indigo-200 text-indigo-600",
-      ping: "bg-indigo-400",
-      dot: "bg-indigo-500",
-      titleSpan: "text-indigo-600",
-      button: "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-600/10",
-      blob: "bg-indigo-200/25 group-hover:bg-indigo-300/35",
-    },
-    green: {
-      iconWrap: "bg-white border-green-200 text-green-600",
-      ping: "bg-green-400",
-      dot: "bg-green-500",
-      titleSpan: "text-green-600",
-      button: "bg-green-600 hover:bg-green-700 shadow-green-600/10",
-      blob: "bg-green-200/25 group-hover:bg-green-300/35",
-    },
-  };
+    document.title = title;
+
+    const setMeta = (name, content, attribute = "name") => {
+      let element = document.head.querySelector(`meta[${attribute}="${name}"]`);
+      if (!element) {
+        element = document.createElement("meta");
+        element.setAttribute(attribute, name);
+        document.head.appendChild(element);
+      }
+      element.setAttribute("content", content);
+    };
+
+    setMeta("description", description);
+    setMeta(
+      "keywords",
+      "AI mock interview, AI interview practice, technical interview, HR interview, GitHub analyzer, ATS checker, resume analyzer, interview preparation"
+    );
+    setMeta("robots", "index, follow");
+    setMeta("author", "SakshatAI");
+
+    setMeta("og:title", title, "property");
+    setMeta("og:description", description, "property");
+    setMeta("og:type", "website", "property");
+    setMeta("og:url", window.location.href, "property");
+
+    setMeta("twitter:card", "summary", "name");
+    setMeta("twitter:title", title, "name");
+    setMeta("twitter:description", description, "name");
+
+    let canonical = document.head.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = `${window.location.origin}${window.location.pathname}`;
+
+    const structuredData = {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: "SakshatAI",
+      applicationCategory: "EducationalApplication",
+      operatingSystem: "Web",
+      description,
+      url: window.location.origin,
+    };
+
+    let jsonLd = document.head.querySelector(
+      'script[data-seo="sakshatai-home"]'
+    );
+    if (!jsonLd) {
+      jsonLd = document.createElement("script");
+      jsonLd.type = "application/ld+json";
+      jsonLd.dataset.seo = "sakshatai-home";
+      document.head.appendChild(jsonLd);
+    }
+    jsonLd.textContent = JSON.stringify(structuredData);
+
+    return () => {
+      // Keep document metadata stable when navigating inside the SPA.
+    };
+  }, []);
 
   return (
-    <div className='min-h-screen bg-[#f3f3f3] flex flex-col'>
+    <div className='min-h-screen overflow-x-hidden bg-[#f3f3f3] flex flex-col'>
       <Navbar />
 
-      <div className="flex-1 px-6 py-20 max-w-7xl mx-auto w-full">
+      <main className="flex-1 w-full px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20 max-w-7xl mx-auto">
 
         {/* TOP BADGE */}
         <div className="flex justify-center mb-6">
-          <div className="bg-gray-100 text-gray-600 text-sm px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
+          <div className="bg-gray-100 text-gray-600 text-xs sm:text-sm px-3.5 sm:px-4 py-2 rounded-full flex items-center gap-2 shadow-sm">
             <HiSparkles size={16} className="text-green-600" />
             AI Powered Smart Interview Platform
           </div>
         </div>
 
         {/* HERO SECTION */}
-        <div className="text-center mb-16">
+        <section aria-labelledby="hero-heading" className="text-center mb-16 sm:mb-20">
 
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className='text-4xl md:text-6xl font-semibold leading-tight max-w-4xl mx-auto'
+            id='hero-heading' className='text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold leading-[1.08] tracking-tight max-w-4xl mx-auto px-1'
           >
             <span className="block">
               Practice Interviews with
             </span>
 
-            <span className='block bg-green-100 text-green-600 px-5 py-1 rounded-full mt-3 inline-block'>
+            <span className='block w-fit mx-auto bg-green-100 text-green-600 px-4 sm:px-5 py-1.5 rounded-full mt-3'>
               AI Intelligence
             </span>
           </motion.h1>
@@ -128,9 +146,11 @@ function Home() {
             adaptive difficulty and real-time performance evaluation
           </motion.p>
 
-          <div className="flex flex-wrap justify-center gap-4 mt-10">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center items-stretch sm:items-center gap-3 sm:gap-4 mt-8 sm:mt-10">
 
             <motion.button
+              type="button"
+              aria-label={userData ? "Start AI interview" : "Get started with SakshatAI"}
               onClick={() => {
                 if (!userData) {
                   setAuthMessage("Login to start your AI interview")
@@ -142,12 +162,14 @@ function Home() {
               }}
               whileHover={{ opacity: 0.9, scale: 1.03 }}
               whileTap={{ opacity: 1, scale: 0.98 }}
-              className='bg-black text-white px-10 py-3 rounded-full hover:opacity-90 transition shadow-md'
+              className='w-full sm:w-auto min-h-11 bg-black text-white px-8 sm:px-10 py-3 rounded-full hover:opacity-90 transition shadow-md'
             >
               {userData ? "Start Interview" : "Get Started"}
             </motion.button>
 
             <motion.button
+              type="button"
+              aria-label={userData ? "View interview history" : "Track interview progress"}
               onClick={() => {
                 if (!userData) {
                   setAuthMessage("Login to view your interview history")
@@ -159,112 +181,258 @@ function Home() {
               }}
               whileHover={{ opacity: 0.9, scale: 1.03 }}
               whileTap={{ opacity: 1, scale: 0.98 }}
-              className='border border-gray-300 px-10 py-3 rounded-full hover:bg-gray-100 transition'
+              className='w-full sm:w-auto border border-gray-300 px-8 sm:px-10 py-3 rounded-full hover:bg-gray-100 transition'
             >
               {userData ? "View History" : "Track Progress"}
             </motion.button>
 
           </div>
-        </div>
+        </section>
 
-        {/* AI TOOLS SECTION — GitHub Analyzer + ATS Score Checker, unified layout */}
-        <div className="mb-32">
+<div className="mb-20 sm:mb-28 max-w-6xl mx-auto">
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-12"
-          >
-            <h2 className='text-3xl md:text-4xl font-semibold'>
-              Go Beyond the{" "}
-              <span className='text-green-600'>Interview</span>
-            </h2>
-            <p className="text-gray-500 mt-4 max-w-xl mx-auto">
-              Two AI tools that prep you before you even walk into the room.
+  <motion.div
+    initial={{ opacity: 0, y: 24 }}
+    whileInView={{ opacity: 1, y: 0 }}
+    viewport={{ once: true }}
+    transition={{ duration: 0.6 }}
+    className="text-center mb-12"
+  >
+    <p className="text-xs font-semibold tracking-[0.25em] text-green-600 uppercase mb-3">
+      Career Intelligence
+    </p>
+    <h2 id="career-intelligence-heading" className="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
+      Go Beyond the <span className="text-green-600">Interview</span>
+    </h2>
+    <p className="text-gray-500 mt-3 sm:mt-4 max-w-xl mx-auto text-sm sm:text-base px-3">
+      Prepare your profile and resume before you even walk into the room.
+    </p>
+  </motion.div>
+
+  <div
+    className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10 items-stretch"
+    role="list"
+    aria-label="SakshatAI career analysis tools"
+  >
+
+    {/* GITHUB ANALYZER */}
+    <motion.div
+      role="listitem" 
+      initial={{ opacity: 0, x: -45, y: 20, rotate: -2 }}
+      whileInView={{ opacity: 1, x: 0, y: 0, rotate: -1.2 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -10, rotate: 0, transition: { duration: 0.35 } }}
+      className="group relative h-full min-h-[430px] sm:min-h-[470px] rounded-[28px] sm:rounded-[34px] p-[1.5px] overflow-hidden"
+    >
+      <motion.div
+        className="absolute inset-[-80%] bg-[conic-gradient(from_0deg,transparent_0deg,transparent_285deg,#22c55e_320deg,#86efac_340deg,transparent_360deg)]"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="relative h-full min-h-[427px] sm:min-h-[467px] overflow-hidden rounded-[27px] sm:rounded-[33px] bg-white shadow-[0_24px_70px_rgba(0,0,0,0.07)] group-hover:shadow-[0_30px_85px_rgba(22,163,74,0.14)] transition-shadow duration-500">
+        <div className="absolute -right-28 -top-28 w-80 h-80 rounded-full bg-green-100/70" />
+        <div className="absolute right-12 top-24 w-32 h-32 rounded-full bg-green-50/70 blur-2xl" />
+
+        <motion.div
+          animate={{ y: [0, -7, 0], rotate: [0, 2, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-5 sm:right-8 top-5 sm:top-8 z-20 w-[62px] h-[62px] sm:w-[76px] sm:h-[76px] rounded-[22px] bg-white border border-green-100 shadow-[0_14px_35px_rgba(22,163,74,0.13)] flex items-center justify-center text-green-600"
+        >
+          <BsGithub size={26} className="sm:w-[31px] sm:h-[31px]" />
+          <span className="absolute -right-1 -top-1 w-3 h-3 rounded-full bg-green-500 border-2 border-white" />
+        </motion.div>
+
+        <div className="relative z-10 h-full min-h-[427px] sm:min-h-[467px] p-5 sm:p-7 md:p-9 flex flex-col">
+          <div className="pr-24">
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-100 px-3.5 py-1.5 text-[11px] font-semibold tracking-wide text-green-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              NEW CAPABILITY
+            </span>
+          </div>
+
+          <div className="mt-7 sm:mt-9 max-w-[82%] sm:max-w-[78%]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-3">Profile Intelligence</p>
+            <h3 className="text-[30px] sm:text-[34px] md:text-[40px] leading-[1] sm:leading-[0.98] font-bold tracking-tight text-gray-950">
+              AI GitHub
+              <span className="block text-green-600 mt-1">Analyzer</span>
+            </h3>
+            <p className="text-sm md:text-[15px] leading-6 text-gray-500 mt-5 max-w-md">
+              Turn your open-source activity into career intelligence with repository, skills, activity and interview-readiness insights.
             </p>
-          </motion.div>
+          </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
+          <div className="mt-7 sm:mt-8 grid grid-cols-3 gap-2 max-w-[420px]">
+            <motion.div whileHover={{ y: -5 }} className="rounded-2xl border border-gray-100 bg-gray-50/80 px-3 py-3.5">
+              <p className="text-lg font-bold text-gray-900">01</p>
+              <p className="text-[9px] uppercase tracking-wider text-gray-400 mt-1">Profile</p>
+            </motion.div>
+            <motion.div whileHover={{ y: -5 }} className="rounded-2xl border border-green-100 bg-green-50/70 px-3 py-3.5">
+              <p className="text-lg font-bold text-green-600">AI</p>
+              <p className="text-[9px] uppercase tracking-wider text-gray-400 mt-1">Insights</p>
+            </motion.div>
+            <motion.div whileHover={{ y: -5 }} className="rounded-2xl border border-gray-100 bg-gray-50/80 px-3 py-3.5">
+              <p className="text-lg font-bold text-gray-900">360°</p>
+              <p className="text-[9px] uppercase tracking-wider text-gray-400 mt-1">Analysis</p>
+            </motion.div>
+          </div>
 
-            {aiTools.map((tool, index) => {
-              const accent = accentClasses[tool.accent];
+          <div className="mt-5 sm:mt-7 max-w-[420px] rounded-2xl border border-gray-100 bg-white/80 px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Activity signal</span>
+              <span className="text-[10px] font-semibold text-green-600">Strong</span>
+            </div>
+            <div className="flex items-end gap-1 h-7">
+              {[35, 52, 42, 68, 58, 82, 72, 94, 76, 100, 86, 96].map((height, i) => (
+                <motion.span key={i} initial={{ height: 3 }} whileInView={{ height: `${height}%` }} viewport={{ once: true }} transition={{ duration: 0.45, delay: i * 0.035 }} className="flex-1 rounded-full bg-green-400/70" />
+              ))}
+            </div>
+          </div>
 
-              return (
-                <motion.div
-                  key={tool.key}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.15 }}
-                  className="relative group bg-gradient-to-br from-white via-white to-gray-50 rounded-3xl p-8 border-2 border-green-100 shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden flex flex-col"
-                >
-
-                  {/* Ambient accent blob */}
-                  <div className={`absolute top-0 right-0 w-40 h-40 rounded-full blur-3xl transition-all duration-500 pointer-events-none ${accent.blob}`} />
-
-                  <div className="relative z-10 flex flex-col flex-1">
-
-                    {/* Badge + Icon row */}
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="inline-flex items-center gap-2 bg-black text-white text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
-                        {tool.badgeIcon}
-                        <span>{tool.badge}</span>
-                      </div>
-
-                      <div className={`relative w-12 h-12 border rounded-xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform duration-300 ${accent.iconWrap}`}>
-                        {tool.icon}
-                        <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                          <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${accent.ping}`}></span>
-                          <span className={`relative inline-flex rounded-full h-2.5 w-2.5 ${accent.dot}`}></span>
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Title + description */}
-                    <h3 className="text-2xl font-bold text-gray-900 tracking-tight mb-3">
-                      {tool.title} <span className={accent.titleSpan}>{tool.titleAccent}</span>
-                    </h3>
-
-                    <p className="text-gray-500 text-sm leading-relaxed mb-6 flex-1">
-                      {tool.desc}
-                    </p>
-
-                    {/* Footer: tag + CTA, pinned to bottom for equal-height alignment */}
-                    <div className="flex items-center justify-between gap-4 pt-4 border-t border-gray-100">
-                      <span className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
-                        {tool.tag}
-                      </span>
-
-                      <motion.button
-                        onClick={() => {
-                          if (!userData) {
-                            setAuthMessage(tool.authMsg);
-                            navigate("/auth");
-                            return;
-                          }
-                          navigate(tool.route);
-                        }}
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`shrink-0 text-white font-medium text-sm px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-2 ${accent.button}`}
-                      >
-                        {tool.cta}
-                        <BsArrowRight size={14} />
-                      </motion.button>
-                    </div>
-
-                  </div>
-                </motion.div>
-              );
-            })}
-
+          <div className="mt-auto pt-6 sm:pt-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <span className="text-[10px] md:text-xs text-gray-400">GitHub → Career Intelligence</span>
+            <motion.button
+              type="button"
+              aria-label="Analyze GitHub profile"
+              onClick={() => {
+                if (!userData) {
+                  setAuthMessage("Login to unlock the GitHub Profile Analyzer");
+                  navigate("/auth");
+                  return;
+                }
+                navigate("/analyzer");
+              }}
+              whileHover={{ scale: 1.04, x: 3 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full sm:w-auto shrink-0 inline-flex justify-center items-center gap-2 rounded-2xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-5 py-3 shadow-lg shadow-green-600/20 transition-colors"
+            >
+              Analyze Profile <BsArrowRight size={15} />
+            </motion.button>
           </div>
         </div>
+      </div>
+    </motion.div>
+
+    {/* ATS ANALYZER */}
+    <motion.div
+      role="listitem" 
+      initial={{ opacity: 0, x: 45, y: 20, rotate: 2 }}
+      whileInView={{ opacity: 1, x: 0, y: 0, rotate: 1.2 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.75, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+      whileHover={{ y: -10, rotate: 0, transition: { duration: 0.35 } }}
+      className="group relative h-full min-h-[430px] sm:min-h-[470px] rounded-[28px] sm:rounded-[34px] p-[1.5px] overflow-hidden"
+    >
+      <motion.div
+        className="absolute inset-[-80%] bg-[conic-gradient(from_180deg,transparent_0deg,transparent_285deg,#22c55e_320deg,#86efac_340deg,transparent_360deg)]"
+        animate={{ rotate: -360 }}
+        transition={{ duration: 5.5, repeat: Infinity, ease: "linear" }}
+      />
+
+      <div className="relative h-full min-h-[427px] sm:min-h-[467px] overflow-hidden rounded-[27px] sm:rounded-[33px] bg-white shadow-[0_24px_70px_rgba(0,0,0,0.07)] group-hover:shadow-[0_30px_85px_rgba(22,163,74,0.14)] transition-shadow duration-500">
+        <div className="absolute -left-28 -bottom-28 w-80 h-80 rounded-full bg-green-100/70" />
+        <div className="absolute left-10 bottom-12 w-36 h-36 rounded-full bg-green-50/80 blur-2xl" />
+
+        <motion.div
+          animate={{ y: [0, -7, 0], rotate: [0, -2, 0] }}
+          transition={{ duration: 4.3, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute right-5 sm:right-7 top-5 sm:top-7 z-20 w-[72px] h-[72px] sm:w-[86px] sm:h-[86px] rounded-full bg-white border border-green-100 shadow-[0_14px_35px_rgba(22,163,74,0.13)] flex flex-col items-center justify-center"
+        >
+          <span className="text-[19px] sm:text-[23px] leading-none font-bold text-green-600">87%</span>
+          <span className="text-[8px] uppercase tracking-widest text-gray-400 mt-1">Match</span>
+        </motion.div>
+
+        <div className="relative z-10 h-full min-h-[427px] sm:min-h-[467px] p-5 sm:p-7 md:p-9 flex flex-col">
+          <div className="pr-28">
+            <span className="inline-flex items-center gap-2 rounded-full bg-green-50 border border-green-100 px-3.5 py-1.5 text-[11px] font-semibold tracking-wide text-green-700">
+              <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+              RESUME INTELLIGENCE
+            </span>
+          </div>
+
+          <div className="mt-7 sm:mt-9 max-w-[82%] sm:max-w-[78%]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gray-400 mb-3">Resume Matching</p>
+            <h3 className="text-[30px] sm:text-[34px] md:text-[40px] leading-[1] sm:leading-[0.98] font-bold tracking-tight text-gray-950">
+              AI ATS
+              <span className="block text-green-600 mt-1">Checker</span>
+            </h3>
+            <p className="text-sm md:text-[15px] leading-6 text-gray-500 mt-5 max-w-md">
+              Compare your resume with a job description to uncover keyword matches, missing skills, formatting issues and concrete improvements.
+            </p>
+          </div>
+
+          <div className="mt-7 sm:mt-8 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 sm:gap-2.5 max-w-[440px]">
+            <motion.div whileHover={{ y: -5, rotate: -2 }} className="min-h-[84px] sm:min-h-[92px] rounded-2xl border border-gray-100 bg-gray-50/80 p-4">
+              <div className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center mb-3"><BsFileEarmarkText size={18} /></div>
+              <p className="text-xs font-semibold text-gray-800">Resume</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">Uploaded PDF</p>
+            </motion.div>
+
+            <motion.div animate={{ x: [0, 5, 0] }} transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }} className="text-green-500 px-1">
+              <BsArrowRight size={19} />
+            </motion.div>
+
+            <motion.div whileHover={{ y: -5, rotate: 2 }} className="min-h-[84px] sm:min-h-[92px] rounded-2xl border border-gray-100 bg-gray-50/80 p-4">
+              <div className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center mb-3"><BsPercent size={18} /></div>
+              <p className="text-xs font-semibold text-gray-800">Job Match</p>
+              <p className="text-[10px] text-gray-400 mt-0.5">ATS Analysis</p>
+            </motion.div>
+          </div>
+
+          <div className="mt-5 sm:mt-6 max-w-[440px]">
+            <div className="flex items-center gap-2 mb-2.5">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400">Detected skills</span>
+              <span className="h-px flex-1 bg-gray-100" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {['React ✓', 'Node.js ✓', 'MongoDB ✓', 'AWS +'].map((skill, i) => (
+                <motion.span key={skill} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.35, delay: i * 0.08 }} className={`px-2.5 py-1.5 rounded-lg text-[10px] font-medium border ${i === 3 ? 'bg-gray-50 text-gray-400 border-gray-100' : 'bg-green-50 text-green-700 border-green-100'}`}>
+                  {skill}
+                </motion.span>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-auto pt-6 sm:pt-7 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
+            <span className="text-[10px] md:text-xs text-gray-400">Resume → Job Compatibility</span>
+            <motion.button
+              type="button"
+              aria-label="Check resume ATS score"
+              onClick={() => {
+                if (!userData) {
+                  setAuthMessage("Login to unlock the ATS Score Checker");
+                  navigate("/auth");
+                  return;
+                }
+                navigate("/ats");
+              }}
+              whileHover={{ scale: 1.04, x: 3 }}
+              whileTap={{ scale: 0.97 }}
+              className="w-full sm:w-auto shrink-0 inline-flex justify-center items-center gap-2 rounded-2xl bg-green-600 hover:bg-green-700 text-white text-sm font-medium px-5 py-3 shadow-lg shadow-green-600/20 transition-colors"
+            >
+              Check ATS Score <BsArrowRight size={15} />
+            </motion.button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+
+  </div>
+</div>
 
         {/* STEPS SECTION */}
-        <div className="flex flex-col md:flex-row justify-center items-center gap-10 mb-28">
+        <section aria-labelledby="interview-steps-heading" className="mb-20 sm:mb-28">
+          <div className="text-center mb-10 sm:mb-14">
+            <p className="text-xs font-semibold tracking-[0.25em] text-green-600 uppercase mb-3">
+              How it works
+            </p>
+            <h2 id="interview-steps-heading" className="text-3xl sm:text-4xl font-semibold text-gray-900 tracking-tight">
+              From Setup to <span className="text-green-600">Interview</span>
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-10 items-stretch">
 
           {
             [
@@ -296,10 +464,10 @@ function Home() {
                 whileHover={{ rotate: 0, scale: 1.06 }}
                 className={`
                   relative bg-white rounded-3xl border-2 border-green-100
-                  hover:border-green-500 p-10 w-80 max-w-[90%] shadow-md
+                  hover:border-green-500 p-10 w-full max-w-none shadow-md
                   hover:shadow-2xl transition-all duration-300
                   ${index === 0 ? "rotate-[-4deg]" : ""}
-                  ${index === 1 ? "rotate-[3deg] md:-mt-6 shadow-xl" : ""}
+                  ${index === 1 ? "rotate-[3deg] shadow-xl" : ""}
                   ${index === 2 ? "rotate-[-3deg]" : ""}
                 `}
               >
@@ -325,22 +493,24 @@ function Home() {
               </motion.div>
             ))
           }
-        </div>
+          </div>
+        </section>
 
         {/* AI CAPABILITIES */}
-        <div className="mb-32">
+        <section aria-labelledby="ai-capabilities-heading" className="mb-20 sm:mb-32">
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className='text-4xl font-semibold text-center mb-16'
+            className='text-3xl sm:text-4xl font-semibold text-center mb-10 sm:mb-16 tracking-tight px-2'
+            id="ai-capabilities-heading"
           >
             Advanced AI{" "}
             <span className='text-green-600'>Capabilities</span>
           </motion.h2>
 
-          <div className='grid md:grid-cols-2 gap-10'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10'>
 
             {
               [
@@ -376,16 +546,18 @@ function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ scale: 1.02 }}
-                  className='bg-white border border-gray-200 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all'
+                  className='bg-white border border-gray-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-xl transition-all h-full'
                 >
 
-                  <div className="flex flex-col md:flex-row items-center gap-8">
+                  <div className="flex flex-col sm:flex-row items-center gap-6 sm:gap-8 h-full">
 
-                    <div className='w-full md:w-1/2 flex justify-center'>
+                    <div className='w-full sm:w-1/2 flex justify-center'>
                       <img
                         src={item.image}
-                        alt={item.title}
-                        className='w-full max-h-64 object-contain'
+                        alt={`${item.title} - SakshatAI`}
+                        loading="lazy"
+                        decoding="async"
+                        className='w-full max-h-52 sm:max-h-64 object-contain'
                       />
                     </div>
 
@@ -412,22 +584,23 @@ function Home() {
             }
 
           </div>
-        </div>
+        </section>
 
         {/* INTERVIEW MODES */}
-        <div className="mb-32">
+        <section aria-labelledby="interview-modes-heading" className="mb-20 sm:mb-32">
 
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className='text-4xl font-semibold text-center mb-16'
+            className='text-3xl sm:text-4xl font-semibold text-center mb-10 sm:mb-16 tracking-tight px-2'
+            id="interview-modes-heading"
           >
             Multiple Interview Modes{" "}
             <span className='text-green-600'>Capabilities</span>
           </motion.h2>
 
-          <div className='grid md:grid-cols-2 gap-10'>
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10'>
 
             {
               [
@@ -459,12 +632,12 @@ function Home() {
                   whileInView={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   whileHover={{ y: -6 }}
-                  className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm hover:shadow-xl transition-all"
+                  className="bg-white border border-gray-200 rounded-3xl p-5 sm:p-8 shadow-sm hover:shadow-xl transition-all h-full"
                 >
 
-                  <div className='flex flex-col md:flex-row items-center justify-between gap-6'>
+                  <div className='flex flex-col sm:flex-row items-center justify-between gap-6 h-full'>
 
-                    <div className='w-full md:w-1/2'>
+                    <div className='w-full sm:w-1/2'>
 
                       <h3 className='font-semibold text-xl mb-3'>
                         {mode.title}
@@ -476,12 +649,14 @@ function Home() {
 
                     </div>
 
-                    <div className='w-full md:w-1/2 flex justify-center md:justify-end'>
+                    <div className='w-full sm:w-1/2 flex justify-center sm:justify-end'>
 
                       <img
                         src={mode.image}
-                        alt={mode.title}
-                        className='w-[220px] object-contain'
+                        alt={`${mode.title} - SakshatAI`}
+                        loading="lazy"
+                        decoding="async"
+                        className='w-[180px] sm:w-[220px] object-contain'
                       />
 
                     </div>
@@ -493,9 +668,9 @@ function Home() {
             }
 
           </div>
-        </div>
+        </section>
 
-      </div>
+      </main>
 
       <Footer />
 
