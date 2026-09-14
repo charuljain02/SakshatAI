@@ -8,7 +8,8 @@ import {
   BsClock,
   BsBarChart,
   BsFileEarmarkText,
-  BsGithub // Imported for the new fancy section
+  BsGithub ,
+  BsPercent
 } from "react-icons/bs";
 import { HiSparkles } from "react-icons/hi";
 import AuthModal from '../components/AuthModal';
@@ -173,6 +174,74 @@ function Home() {
                   className="w-full bg-green-600 text-white font-medium text-sm px-6 py-3 rounded-xl hover:bg-green-700 transition shadow-md shadow-green-600/10"
                 >
                   Analyze My Profile
+                </motion.button>
+              </div>
+
+            </div>
+          </div>
+        </motion.div>
+        
+        {/* ATS SCORE CHECKER SECTION */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.25 }}
+          className="mb-32 max-w-4xl mx-auto"
+        >
+          <div className="relative group bg-gradient-to-br from-[#1c1d22] via-[#1c1d22] to-[#22242c]/50 rounded-[32px] p-8 md:p-10 border border-white/5 shadow-2xl hover:shadow-green-500/5 hover:border-white/10 transition-all duration-300 overflow-hidden">
+
+            {/* Ambient Accent Blobs */}
+            <div className="absolute top-0 right-0 w-48 h-48 bg-green-500/10 rounded-full blur-[64px] group-hover:bg-green-500/15 transition-all duration-500 pointer-events-none" />
+            <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-white/5 rounded-full blur-[48px] pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-center justify-between gap-8 relative z-10">
+
+              {/* Text Context & Left Info */}
+              <div className="flex-1 text-center md:text-left">
+                <div className="inline-flex items-center gap-2 bg-white text-black text-xs font-bold px-3 py-1.5 rounded-full mb-4 shadow-sm">
+                  <BsPercent size={14} className="animate-pulse" />
+                  <span>NEW CAPABILITY</span>
+                </div>
+
+                <h2 className="text-2xl md:text-3xl font-bold text-white tracking-tight mb-3">
+                  AI ATS <span className="text-green-400">Score Checker</span>
+                </h2>
+
+                <p className="text-gray-400 text-sm md:text-base max-w-xl leading-relaxed">
+                  Upload your resume alongside a job description to see exactly how
+                  an Applicant Tracking System would score it — matched and missing
+                  keywords, formatting red flags, and concrete edits to boost your match.
+                </p>
+              </div>
+
+              {/* Action Side Box */}
+              <div className="flex flex-col items-center justify-center min-w-[240px] w-full md:w-auto bg-[#131418] border border-white/5 p-6 rounded-2xl text-center">
+                <div className="relative w-14 h-14 bg-[#1c1d22] border border-white/10 text-white rounded-xl flex items-center justify-center shadow-md mb-4 group-hover:scale-110 transition-transform duration-300">
+                  <BsFileEarmarkText size={26} />
+                  <span className="absolute top-1 right-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                  </span>
+                </div>
+
+                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">
+                  Resume Match Coach
+                </span>
+
+                <motion.button
+                  onClick={() => {
+                    if (!userData) {
+                      setAuthMessage("Login to unlock the ATS Score Checker");
+                      navigate("/auth");
+                      return;
+                    }
+                    navigate("/ats");
+                  }}
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="w-full bg-green-600 text-white font-semibold text-sm px-6 py-3 rounded-xl hover:bg-green-500 transition shadow-lg shadow-green-600/20"
+                >
+                  Check My ATS Score
                 </motion.button>
               </div>
 
