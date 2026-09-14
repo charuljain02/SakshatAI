@@ -23,15 +23,34 @@ function Auth() {
 
         try {
 
+            // --------------------------------
             // 1. Firebase Google Login
-            const response = await signInWithPopup(auth, provider);
+            // --------------------------------
+
+            const response = await signInWithPopup(
+                auth,
+                provider
+            );
 
             const user = response.user;
 
             const name = user.displayName;
             const email = user.email;
 
-            // 2. Send user data to backend
+            // --------------------------------
+            // 2. Get Firebase ID Token
+            // --------------------------------
+
+            const token = await user.getIdToken();
+
+            console.log("Firebase login successful");
+            console.log("User:", email);
+            console.log("Token received:", !!token);
+
+            // --------------------------------
+            // 3. Send user + token to backend
+            // --------------------------------
+
             await axios.post(
                 `${ServerUrl}/api/auth/google`,
                 {
@@ -39,51 +58,93 @@ function Auth() {
                     email
                 },
                 {
-                    withCredentials: true
+                    withCredentials: true,
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
-            // 3. Get logged-in user
+            // --------------------------------
+            // 4. Get current user
+            // --------------------------------
+
             const currentUser = await axios.get(
                 `${ServerUrl}/api/user/current-user`,
                 {
-                    withCredentials: true
+                    withCredentials: true,
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
                 }
             );
 
-            // 4. Save user in Redux
-            dispatch(setUserData(currentUser.data));
+            // --------------------------------
+            // 5. Save user in Redux
+            // --------------------------------
 
-            // 5. Go to home
+            dispatch(
+                setUserData(currentUser.data)
+            );
+
+            // --------------------------------
+            // 6. Go to Home
+            // --------------------------------
+
             navigate("/");
 
         } catch (error) {
 
-            console.error("LOGIN ERROR:", error);
+            console.error(
+                "FULL LOGIN ERROR:",
+                error
+            );
 
             let errorMessage = "Google login failed.";
 
-            if (error.code) {
-                errorMessage += `\n\nFirebase Error: ${error.code}`;
+            // Firebase error
+            if (
+                error?.code &&
+                error.code.startsWith("auth/")
+            ) {
+                errorMessage +=
+                    `\n\nFirebase Error: ${error.code}`;
             }
 
+            // Backend / Axios error
             if (error.response) {
 
-                errorMessage += `\n\nServer Status: ${error.response.status}`;
+                errorMessage +=
+                    `\n\nServer Status: ${error.response.status}`;
 
-                if (error.response.data?.message) {
-                    errorMessage += `\n${error.response.data.message}`;
+                if (
+                    error.response.data?.message
+                ) {
+
+                    errorMessage +=
+                        `\n${error.response.data.message}`;
+
+                } else if (
+                    typeof error.response.data === "string"
+                ) {
+
+                    errorMessage +=
+                        `\n${error.response.data}`;
+
                 }
 
             } else if (error.message) {
 
-                errorMessage += `\n\n${error.message}`;
+                errorMessage +=
+                    `\n\n${error.message}`;
 
             }
 
             alert(errorMessage);
 
-            dispatch(setUserData(null));
+            dispatch(
+                setUserData(null)
+            );
         }
     };
 
@@ -92,9 +153,17 @@ function Auth() {
         <div className='w-full min-h-screen bg-[#f3f3f3] flex items-center justify-center px-6 py-20'>
 
             <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1.05 }}
+                initial={{
+                    opacity: 0,
+                    y: 40
+                }}
+                animate={{
+                    opacity: 1,
+                    y: 0
+                }}
+                transition={{
+                    duration: 1.05
+                }}
                 className='w-full max-w-md p-8 rounded-3xl bg-white shadow-2xl border border-gray-200'
             >
 
